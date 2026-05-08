@@ -291,9 +291,61 @@
       font-size: 0.8rem;
       color: #666;
     }
+
     .active-diff {
       border-color: #6c63ff;
       color: #6c63ff;
+    }
+
+    /* ── Timer styles ── */
+    .timer-display {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      padding: 0.9rem 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    .timer-display.visible { display: flex; }
+
+    .timer-clock {
+      font-size: 1.6rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: #6c63ff;
+      letter-spacing: 0.05em;
+      min-width: 60px;
+    }
+
+    .timer-clock.warning { color: #f59e0b; }
+    .timer-clock.danger  { color: #ef4444; }
+
+    .timer-bar-wrap {
+      flex: 1;
+      height: 4px;
+      background: #2a2a2a;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .timer-bar {
+      height: 100%;
+      background: #6c63ff;
+      border-radius: 2px;
+      transition: width 1s linear, background 0.4s;
+      width: 100%;
+    }
+
+    .timer-bar.warning { background: #f59e0b; }
+    .timer-bar.danger  { background: #ef4444; }
+
+    .timer-label {
+      font-size: 0.75rem;
+      color: #555;
+      white-space: nowrap;
     }
   </style>
 </head>
@@ -332,7 +384,8 @@
     <h1>Your Question</h1>
     <p class="subtitle">Read carefully and answer as you would in a real interview.</p>
     <div class="tag" id="question-tag"></div>
-    <!-- Choosing Diffuclty -->
+
+    <!-- Difficulty selector -->
     <div style="margin-bottom: 1rem;">
       <p style="font-size: 0.8rem; color: #666; margin-bottom: 8px;">Difficulty</p>
       <div style="display: flex; gap: 8px;">
@@ -341,11 +394,32 @@
         <button class="btn btn-ghost diff-btn" onclick="setDifficulty('senior')">Senior</button>
       </div>
     </div>
+
+    <!-- Timer duration selector -->
+    <div style="margin-bottom: 1rem;">
+      <p style="font-size: 0.8rem; color: #666; margin-bottom: 8px;">Timer Duration</p>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button class="btn btn-ghost dur-btn" onclick="setDuration(120)">2 min</button>
+        <button class="btn btn-ghost dur-btn active-diff" onclick="setDuration(180)">3 min</button>
+        <button class="btn btn-ghost dur-btn" onclick="setDuration(300)">5 min</button>
+        <button class="btn btn-ghost" id="start-timer-btn" onclick="startTimer()" style="margin-left: 4px;">▶ Start Timer</button>
+      </div>
+    </div>
+
+    <!-- Countdown display (hidden until timer starts) -->
+    <div class="timer-display" id="timer-display">
+      <span class="timer-clock" id="timer-clock">3:00</span>
+      <div class="timer-bar-wrap">
+        <div class="timer-bar" id="timer-bar"></div>
+      </div>
+      <span class="timer-label" id="timer-label">Time remaining</span>
+    </div>
+
     <div class="question-box" id="question-text">Loading question...</div>
     <textarea id="answer-input" placeholder="Type your answer here..."></textarea>
     <div class="btn-row">
       <button class="btn btn-primary" id="submit-btn" onclick="submitAnswer()">Get Feedback</button>
-      <button class="btn btn-ghost" onclick="showScreen('screen-home')">← Back</button>
+      <button class="btn btn-ghost" onclick="goHome()">← Back</button>
     </div>
     <div class="loading" id="loading-feedback">
       <div class="spinner"></div>
@@ -398,22 +472,130 @@
 </div>
 
 <script>
-  let currentType = '';
-  let currentQuestion = '';
+  let currentType       = '';
+  let currentQuestion   = '';
   let currentDifficulty = 'intermediate';
+  let currentDuration   = 180;   // default 3 min in seconds
+  let timerInterval     = null;
+  let timeLeft          = 0;
+
+  /* ── Helpers ── */
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  function stopTimer() {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+  }
+
+  /* ── Difficulty ── */
   function setDifficulty(level) {
     currentDifficulty = level;
     document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active-diff'));
     event.target.classList.add('active-diff');
     startInterview(currentType);
   }
-  function showScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
+
+  /* ── Timer duration ── */
+  function setDuration(seconds) {
+    currentDuration = seconds;
+    document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('active-diff'));
+    event.target.classList.add('active-diff');
+
+    // Reset the clock preview to the new duration without starting
+    document.getElementById('timer-clock').textContent = formatTime(seconds);
+    document.getElementById('timer-clock').className = 'timer-clock';
+    document.getElementById('timer-bar').style.width = '100%';
+    document.getElementById('timer-bar').className = 'timer-bar';
+
+    stopTimer();
+    document.getElementById('start-timer-btn').textContent = '▶ Start Timer';
+    document.getElementById('start-timer-btn').disabled = false;
   }
 
+  /* ── Start timer ── */
+  function startTimer() {
+    stopTimer(); // clear any existing timer first
+
+    timeLeft = currentDuration;
+    const totalTime = currentDuration;
+
+    const display   = document.getElementById('timer-display');
+    const clock     = document.getElementById('timer-clock');
+    const bar       = document.getElementById('timer-bar');
+    const startBtn  = document.getElementById('start-timer-btn');
+
+    display.classList.add('visible');
+    startBtn.textContent = '⏸ Running…';
+    startBtn.disabled = true;
+
+    // Tick immediately so display is fresh on start
+    clock.textContent = formatTime(timeLeft);
+
+    timerInterval = setInterval(() => {
+      timeLeft--;
+
+      const pct = (timeLeft / totalTime) * 100;
+      clock.textContent = formatTime(timeLeft);
+      bar.style.width = pct + '%';
+
+      // Colour states: warning < 33%, danger < 15%
+      const warningThreshold = totalTime * 0.33;
+      const dangerThreshold  = totalTime * 0.15;
+
+      if (timeLeft <= dangerThreshold) {
+        clock.className = 'timer-clock danger';
+        bar.className   = 'timer-bar danger';
+      } else if (timeLeft <= warningThreshold) {
+        clock.className = 'timer-clock warning';
+        bar.className   = 'timer-bar warning';
+      }
+
+      if (timeLeft <= 0) {
+        stopTimer();
+        clock.textContent = '0:00';
+        bar.style.width = '0%';
+        document.getElementById('timer-label').textContent = "Time's up!";
+        submitAnswer();
+      }
+    }, 1000);
+  }
+
+  /* ── Navigation: back from question screen ── */
+  function goHome() {
+    stopTimer();
+    document.getElementById('timer-display').classList.remove('visible');
+    document.getElementById('start-timer-btn').textContent = '▶ Start Timer';
+    document.getElementById('start-timer-btn').disabled = false;
+    showScreen('screen-home');
+  }
+
+  /* ── Interview flow ── */
   async function startInterview(type) {
     currentType = type;
+    stopTimer();
+
+    // Reset timer UI
+    const display = document.getElementById('timer-display');
+    display.classList.remove('visible');
+    document.getElementById('timer-clock').textContent = formatTime(currentDuration);
+    document.getElementById('timer-clock').className = 'timer-clock';
+    document.getElementById('timer-bar').style.width = '100%';
+    document.getElementById('timer-bar').className = 'timer-bar';
+    document.getElementById('timer-label').textContent = 'Time remaining';
+    document.getElementById('start-timer-btn').textContent = '▶ Start Timer';
+    document.getElementById('start-timer-btn').disabled = false;
+
     showScreen('screen-question');
     document.getElementById('question-tag').textContent = type;
     document.getElementById('question-text').textContent = 'Loading question...';
@@ -427,6 +609,8 @@
   }
 
   async function submitAnswer() {
+    stopTimer(); // stop timer if it's still running
+
     const answer = document.getElementById('answer-input').value.trim();
     if (!answer) {
       alert('Please type your answer first!');
