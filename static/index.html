@@ -291,6 +291,10 @@
       font-size: 0.8rem;
       color: #666;
     }
+    .active-diff {
+      border-color: #6c63ff;
+      color: #6c63ff;
+    }
   </style>
 </head>
 <body>
@@ -328,6 +332,15 @@
     <h1>Your Question</h1>
     <p class="subtitle">Read carefully and answer as you would in a real interview.</p>
     <div class="tag" id="question-tag"></div>
+    <!-- Choosing Diffuclty -->
+    <div style="margin-bottom: 1rem;">
+      <p style="font-size: 0.8rem; color: #666; margin-bottom: 8px;">Difficulty</p>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn btn-ghost diff-btn" onclick="setDifficulty('junior')">Junior</button>
+        <button class="btn btn-ghost diff-btn active-diff" onclick="setDifficulty('intermediate')">Intermediate</button>
+        <button class="btn btn-ghost diff-btn" onclick="setDifficulty('senior')">Senior</button>
+      </div>
+    </div>
     <div class="question-box" id="question-text">Loading question...</div>
     <textarea id="answer-input" placeholder="Type your answer here..."></textarea>
     <div class="btn-row">
@@ -387,7 +400,13 @@
 <script>
   let currentType = '';
   let currentQuestion = '';
-
+  let currentDifficulty = 'intermediate';
+  function setDifficulty(level) {
+    currentDifficulty = level;
+    document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active-diff'));
+    event.target.classList.add('active-diff');
+    startInterview(currentType);
+  }
   function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
@@ -401,7 +420,7 @@
     document.getElementById('answer-input').value = '';
     document.getElementById('submit-btn').disabled = false;
 
-    const res = await fetch(`/question/${type}`);
+    const res = await fetch(`/question/${type}?difficulty=${currentDifficulty}`);
     const data = await res.json();
     currentQuestion = data.question;
     document.getElementById('question-text').textContent = data.question;
