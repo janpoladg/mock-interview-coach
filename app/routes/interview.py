@@ -15,15 +15,15 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 router = APIRouter()
 
 
-def build_question_prompt(interview_type: str, difficulty: str = "intermediate") -> str:
+def build_question_prompt(interview_type: str, difficulty: str = "intermediate", language: str = "English") -> str:
     prompts = {
-        "behavioral": f"Generate a single {difficulty} level behavioral interview question that tests teamwork, leadership, or handling failure. Just the question, nothing else.",
-        "technical": f"Generate a single {difficulty} level technical interview question about Python, data structures, or algorithms. Just the question, nothing else.",
-        "intro": f"Generate a single {difficulty} level interview question from the 'getting to know you' category. Just the question, nothing else.",
+        "behavioral": f"Generate a single {difficulty} level behavioral interview question that tests teamwork, leadership, or handling failure. Just the question, nothing else. In {language} language",
+        "technical": f"Generate a single {difficulty} level technical interview question about Python, data structures, or algorithms. Just the question, nothing else.In {language} language",
+        "intro": f"Generate a single {difficulty} level interview question from the 'getting to know you' category. Just the question, nothing else.In {language} language",
     }
-    return prompts.get(interview_type, f"Generate a {difficulty} level general interview question.")
+    return prompts.get(interview_type, f"Generate a {difficulty} level general interview question.In {language} language")
 
-def build_feedback_prompt(question: str, answer: str, interview_type: str) -> str:
+def build_feedback_prompt(question: str, answer: str, interview_type: str, language: str = "English") -> str:
     return f"""
 You are an expert interview coach. A candidate just answered an interview question.
 
@@ -31,7 +31,7 @@ Interview type: {interview_type}
 Question: {question}
 Candidate's answer: {answer}
 
-Give structured feedback with these sections:
+Give structured feedback with these sections, in this {language}:
 1. Score (X/10)
 2. What was good
 3. What could be improved
@@ -41,11 +41,11 @@ Be encouraging but honest. Keep it concise.
 """
 
 @router.get("/question/{interview_type}")
-def get_question(interview_type: str, difficulty: str = "intermediate"):
+def get_question(interview_type: str, difficulty: str = "intermediate", language: str = "English"):
     if interview_type not in ["behavioral", "technical", "intro"]:
         return {"error": "Invalid type. Choose: behavioral, technical, intro"}
 
-    prompt = build_question_prompt(interview_type,difficulty)
+    prompt = build_question_prompt(interview_type,difficulty,language)
 
     response = client.chat.completions.create(
         model="gpt-4o-mini",
@@ -60,7 +60,7 @@ def get_question(interview_type: str, difficulty: str = "intermediate"):
 
 @router.post("/feedback")
 def get_feedback(body: AnswerRequest, db: Session = Depends(get_db)):
-    prompt = build_feedback_prompt(body.question, body.answer, body.interview_type)
+    prompt = build_feedback_prompt(body.question, body.answer, body.interview_type, body.language)
 
     response = client.chat.completions.create(
         model="gpt-4o-mini",

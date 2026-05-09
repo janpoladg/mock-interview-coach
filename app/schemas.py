@@ -6,6 +6,7 @@ class AnswerRequest(BaseModel):
     question: str
     answer: str
     interview_type: str
+    language: str = "English"
 
 class SessionResponse(BaseModel): 
     id: int

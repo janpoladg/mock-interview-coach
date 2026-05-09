@@ -8,31 +8,61 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --bg-page: #0f0f0f;
+      --bg-card: #1a1a1a;
+      --bg-tag: #1e1b2e;
+      --border: #2a2a2a;
+      --text-primary: #f0f0f0;
+      --text-secondary: #888;
+      --text-label: #666;
+      --text-placeholder: #444;
+      --text-muted: #555;
+      --text-bright: #ffffff;
+      --text-dim: #cccccc;
+      --text-dimmer: #dddddd;
+      --bg-disabled: #333333;
+    }
+
+    [data-theme="light"] {
+      --bg-page: #f5f5f5;
+      --bg-card: #ffffff;
+      --bg-tag: #eeecff;
+      --border: #e0e0e0;
+      --text-primary: #111111;
+      --text-secondary: #555555;
+      --text-label: #777777;
+      --text-placeholder: #aaaaaa;
+      --text-muted: #999999;
+      --text-bright: #111111;
+      --text-dim: #444444;
+      --text-dimmer: #333333;
+      --bg-disabled: #dddddd;
+    }
+
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #0f0f0f;
-      color: #f0f0f0;
+      background: var(--bg-page);
+      color: var(--text-primary);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 2rem;
+      transition: background 0.2s, color 0.2s;
     }
 
-    .container {
-      width: 100%;
-      max-width: 680px;
-    }
+    .container { width: 100%; max-width: 680px; }
 
     h1 {
       font-size: 1.8rem;
       font-weight: 700;
       margin-bottom: 0.4rem;
-      color: #ffffff;
+      color: var(--text-bright);
     }
 
     .subtitle {
-      color: #888;
+      color: var(--text-secondary);
       font-size: 0.95rem;
       margin-bottom: 2rem;
     }
@@ -40,7 +70,23 @@
     .screen { display: none; }
     .screen.active { display: block; }
 
-    /* Type selector cards */
+    .theme-toggle {
+      position: fixed;
+      top: 1.2rem;
+      right: 1.2rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+      z-index: 100;
+    }
+
+    .theme-toggle:hover { color: var(--text-primary); border-color: #6c63ff; }
+
     .type-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -49,8 +95,8 @@
     }
 
     .type-card {
-      background: #1a1a1a;
-      border: 1px solid #2a2a2a;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       border-radius: 12px;
       padding: 1.2rem 1rem;
       cursor: pointer;
@@ -58,25 +104,20 @@
       text-align: center;
     }
 
-    .type-card:hover {
-      border-color: #6c63ff;
-      background: #1e1b2e;
-    }
-
+    .type-card:hover { border-color: #6c63ff; background: var(--bg-tag); }
     .type-card .icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
-    .type-card .label { font-size: 0.9rem; font-weight: 500; color: #ddd; }
-    .type-card .desc { font-size: 0.75rem; color: #666; margin-top: 4px; }
+    .type-card .label { font-size: 0.9rem; font-weight: 500; color: var(--text-dimmer); }
+    .type-card .desc { font-size: 0.75rem; color: var(--text-label); margin-top: 4px; }
 
-    /* Question screen */
     .question-box {
-      background: #1a1a1a;
-      border: 1px solid #2a2a2a;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       border-radius: 12px;
       padding: 1.5rem;
       margin-bottom: 1.5rem;
       font-size: 1.1rem;
       line-height: 1.6;
-      color: #f0f0f0;
+      color: var(--text-primary);
       min-height: 80px;
     }
 
@@ -85,7 +126,7 @@
       font-size: 0.75rem;
       padding: 3px 10px;
       border-radius: 20px;
-      background: #1e1b2e;
+      background: var(--bg-tag);
       color: #6c63ff;
       border: 1px solid #6c63ff44;
       margin-bottom: 1rem;
@@ -94,11 +135,11 @@
 
     textarea {
       width: 100%;
-      background: #1a1a1a;
-      border: 1px solid #2a2a2a;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       border-radius: 12px;
       padding: 1rem;
-      color: #f0f0f0;
+      color: var(--text-primary);
       font-size: 0.95rem;
       font-family: inherit;
       resize: vertical;
@@ -108,9 +149,8 @@
     }
 
     textarea:focus { border-color: #6c63ff; }
-    textarea::placeholder { color: #444; }
+    textarea::placeholder { color: var(--text-placeholder); }
 
-    /* Buttons */
     .btn {
       display: inline-block;
       padding: 10px 22px;
@@ -122,77 +162,45 @@
       transition: all 0.2s;
     }
 
-    .btn-primary {
-      background: #6c63ff;
-      color: white;
-    }
-
+    .btn-primary { background: #6c63ff; color: white; }
     .btn-primary:hover { background: #5a52d5; }
-    .btn-primary:disabled { background: #333; color: #666; cursor: not-allowed; }
+    .btn-primary:disabled { background: var(--bg-disabled); color: var(--text-label); cursor: not-allowed; }
 
     .btn-ghost {
       background: transparent;
-      color: #888;
-      border: 1px solid #2a2a2a;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
     }
 
-    .btn-ghost:hover { color: #fff; border-color: #444; }
+    .btn-ghost:hover { color: var(--text-primary); border-color: var(--text-muted); }
 
-    .btn-row {
-      display: flex;
-      gap: 10px;
-      margin-top: 1rem;
-      align-items: center;
-    }
+    .btn-row { display: flex; gap: 10px; margin-top: 1rem; align-items: center; }
 
-    /* Feedback screen */
-    .score-badge {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: #6c63ff;
-      margin-bottom: 0.3rem;
-    }
-
-    .score-label {
-      font-size: 0.85rem;
-      color: #666;
-      margin-bottom: 1.5rem;
-    }
+    .score-badge { font-size: 2.5rem; font-weight: 700; color: #6c63ff; margin-bottom: 0.3rem; }
+    .score-label { font-size: 0.85rem; color: var(--text-label); margin-bottom: 1.5rem; }
 
     .feedback-box {
-      background: #1a1a1a;
-      border: 1px solid #2a2a2a;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       border-radius: 12px;
       padding: 1.5rem;
       line-height: 1.8;
       font-size: 0.95rem;
-      color: #ccc;
+      color: var(--text-dim);
     }
 
-    .feedback-box h1,
-    .feedback-box h2,
-    .feedback-box h3 { color: #fff; margin: 1rem 0 0.4rem; font-size: 1rem; }
-    .feedback-box strong { color: #fff; }
+    .feedback-box h1, .feedback-box h2, .feedback-box h3 { color: var(--text-bright); margin: 1rem 0 0.4rem; font-size: 1rem; }
+    .feedback-box strong { color: var(--text-bright); }
     .feedback-box p { margin-bottom: 0.6rem; }
     .feedback-box ul { padding-left: 1.2rem; }
     .feedback-box li { margin-bottom: 0.3rem; }
 
-    /* Loading spinner */
-    .loading {
-      display: none;
-      align-items: center;
-      gap: 10px;
-      color: #666;
-      font-size: 0.9rem;
-      margin-top: 1rem;
-    }
-
+    .loading { display: none; align-items: center; gap: 10px; color: var(--text-label); font-size: 0.9rem; margin-top: 1rem; }
     .loading.active { display: flex; }
 
     .spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid #333;
+      width: 16px; height: 16px;
+      border: 2px solid var(--bg-disabled);
       border-top-color: #6c63ff;
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
@@ -200,10 +208,9 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* History cards */
     .history-card {
-      background: #1a1a1a;
-      border: 1px solid #2a2a2a;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       border-radius: 12px;
       padding: 1.2rem 1.5rem;
       margin-bottom: 12px;
@@ -212,98 +219,51 @@
     }
 
     .history-card:hover { border-color: #6c63ff44; }
+    .history-card h3 { font-size: 0.95rem; color: var(--text-primary); margin-bottom: 8px; line-height: 1.5; }
+    .history-card p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px; }
+    .history-card .preview { font-size: 0.82rem; color: var(--text-muted); margin-top: 6px; font-style: italic; }
+    .history-card .expand-hint { font-size: 0.75rem; color: #6c63ff; margin-top: 8px; }
 
-    .history-card h3 {
-      font-size: 0.95rem;
-      color: #f0f0f0;
-      margin-bottom: 8px;
-      line-height: 1.5;
-    }
-
-    .history-card p {
-      font-size: 0.85rem;
-      color: #888;
-      margin-bottom: 4px;
-    }
-
-    .history-card .preview {
-      font-size: 0.82rem;
-      color: #555;
-      margin-top: 6px;
-      font-style: italic;
-    }
-
-    .history-card .expand-hint {
-      font-size: 0.75rem;
-      color: #6c63ff;
-      margin-top: 8px;
-    }
-
-    /* Accordion feedback detail */
     .feedback-detail {
       display: none;
       margin-top: 12px;
       padding-top: 12px;
-      border-top: 1px solid #2a2a2a;
+      border-top: 1px solid var(--border);
       font-size: 0.85rem;
-      color: #ccc;
+      color: var(--text-dim);
       line-height: 1.7;
     }
 
     .feedback-detail.expanded { display: block; }
-
-    .feedback-detail h1,
-    .feedback-detail h2,
-    .feedback-detail h3 { color: #fff; margin: 0.8rem 0 0.3rem; font-size: 0.9rem; }
-    .feedback-detail strong { color: #ddd; }
+    .feedback-detail h1, .feedback-detail h2, .feedback-detail h3 { color: var(--text-bright); margin: 0.8rem 0 0.3rem; font-size: 0.9rem; }
+    .feedback-detail strong { color: var(--text-dimmer); }
     .feedback-detail p { margin-bottom: 0.5rem; }
     .feedback-detail ul { padding-left: 1.2rem; }
     .feedback-detail li { margin-bottom: 0.3rem; }
 
     #history-list { margin-bottom: 1.5rem; }
 
-    /* Stats screen */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 1.5rem;
-    }
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 1.5rem; }
 
     .stat-card {
-      background: #1a1a1a;
-      border: 1px solid #2a2a2a;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       border-radius: 12px;
       padding: 1.5rem;
       text-align: center;
     }
 
-    .stat-value {
-      display: block;
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: #6c63ff;
-      margin-bottom: 0.4rem;
-    }
+    .stat-value { display: block; font-size: 1.8rem; font-weight: 700; color: #6c63ff; margin-bottom: 0.4rem; }
+    .stat-label { display: block; font-size: 0.8rem; color: var(--text-label); }
 
-    .stat-label {
-      display: block;
-      font-size: 0.8rem;
-      color: #666;
-    }
+    .active-diff { border-color: #6c63ff; color: #6c63ff; }
 
-    .active-diff {
-      border-color: #6c63ff;
-      color: #6c63ff;
-    }
-
-    /* ── Timer styles ── */
     .timer-display {
       display: none;
       align-items: center;
       gap: 12px;
-      background: #1a1a1a;
-      border: 1px solid #2a2a2a;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       border-radius: 12px;
       padding: 0.9rem 1.2rem;
       margin-bottom: 1rem;
@@ -323,13 +283,7 @@
     .timer-clock.warning { color: #f59e0b; }
     .timer-clock.danger  { color: #ef4444; }
 
-    .timer-bar-wrap {
-      flex: 1;
-      height: 4px;
-      background: #2a2a2a;
-      border-radius: 2px;
-      overflow: hidden;
-    }
+    .timer-bar-wrap { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
 
     .timer-bar {
       height: 100%;
@@ -341,143 +295,470 @@
 
     .timer-bar.warning { background: #f59e0b; }
     .timer-bar.danger  { background: #ef4444; }
+    .timer-label { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; }
 
-    .timer-label {
-      font-size: 0.75rem;
-      color: #555;
-      white-space: nowrap;
+    /* Code editor tabs */
+    .answer-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 8px;
     }
+
+    .tab-btn {
+      padding: 6px 16px;
+      border-radius: 8px 8px 0 0;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      border-bottom: none;
+      background: var(--bg-page);
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active-tab {
+      background: var(--bg-card);
+      color: #6c63ff;
+      border-color: #6c63ff44;
+    }
+
+    #code-editor-wrap {
+      display: none;
+      border: 1px solid var(--border);
+      border-radius: 0 12px 12px 12px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+      height: 240px;
+    }
+
+    #code-editor-wrap.visible { display: block; }
+
+    #text-answer-wrap { margin-bottom: 0; }
+    #text-answer-wrap.hidden { display: none; }
   </style>
 </head>
 <body>
+
+<button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">☀️ Light mode</button>
+
 <div class="container">
 
   <!-- Screen 1: Home -->
   <div class="screen active" id="screen-home">
-    <h1>Mock Interview Coach</h1>
-    <p class="subtitle">Pick a category and practice with AI-powered feedback.</p>
+    <h1 data-i18n="home_title">Mock Interview Coach</h1>
+    <p class="subtitle" data-i18n="home_subtitle">Pick a category and practice with AI-powered feedback.</p>
     <div class="type-grid">
       <div class="type-card" onclick="startInterview('behavioral')">
         <div class="icon">🧠</div>
-        <div class="label">Behavioral</div>
-        <div class="desc">STAR format questions</div>
+        <div class="label" data-i18n="type_behavioral">Behavioral</div>
+        <div class="desc" data-i18n="type_behavioral_desc">STAR format questions</div>
       </div>
       <div class="type-card" onclick="startInterview('technical')">
         <div class="icon">💻</div>
-        <div class="label">Technical</div>
-        <div class="desc">DSA & Python questions</div>
+        <div class="label" data-i18n="type_technical">Technical</div>
+        <div class="desc" data-i18n="type_technical_desc">DSA & Python questions</div>
       </div>
       <div class="type-card" onclick="startInterview('intro')">
         <div class="icon">👋</div>
-        <div class="label">Introduction</div>
-        <div class="desc">Tell me about yourself</div>
+        <div class="label" data-i18n="type_intro">Introduction</div>
+        <div class="desc" data-i18n="type_intro_desc">Tell me about yourself</div>
       </div>
     </div>
     <div class="btn-row" style="margin-top: 1.5rem; justify-content: center;">
-      <button class="btn btn-ghost" onclick="loadHistory()">📋 View History</button>
-      <button class="btn btn-ghost" onclick="loadStats()">📊 View Stats</button>
+      <button class="btn btn-ghost" onclick="loadHistory()" data-i18n="btn_history">📋 View History</button>
+      <button class="btn btn-ghost" onclick="loadStats()" data-i18n="btn_stats">📊 View Stats</button>
     </div>
   </div>
 
   <!-- Screen 2: Question -->
   <div class="screen" id="screen-question">
-    <h1>Your Question</h1>
-    <p class="subtitle">Read carefully and answer as you would in a real interview.</p>
+    <h1 data-i18n="question_title">Your Question</h1>
+    <p class="subtitle" data-i18n="question_subtitle">Read carefully and answer as you would in a real interview.</p>
     <div class="tag" id="question-tag"></div>
 
-    <!-- Difficulty selector -->
+    <!-- Difficulty -->
     <div style="margin-bottom: 1rem;">
-      <p style="font-size: 0.8rem; color: #666; margin-bottom: 8px;">Difficulty</p>
+      <p style="font-size: 0.8rem; color: var(--text-label); margin-bottom: 8px;" data-i18n="label_difficulty">Difficulty</p>
       <div style="display: flex; gap: 8px;">
-        <button class="btn btn-ghost diff-btn" onclick="setDifficulty('junior')">Junior</button>
-        <button class="btn btn-ghost diff-btn active-diff" onclick="setDifficulty('intermediate')">Intermediate</button>
-        <button class="btn btn-ghost diff-btn" onclick="setDifficulty('senior')">Senior</button>
+        <button class="btn btn-ghost diff-btn" onclick="setDifficulty('junior')" data-i18n="diff_junior">Junior</button>
+        <button class="btn btn-ghost diff-btn active-diff" onclick="setDifficulty('intermediate')" data-i18n="diff_intermediate">Intermediate</button>
+        <button class="btn btn-ghost diff-btn" onclick="setDifficulty('senior')" data-i18n="diff_senior">Senior</button>
       </div>
     </div>
 
-    <!-- Timer duration selector -->
+    <!-- Language -->
     <div style="margin-bottom: 1rem;">
-      <p style="font-size: 0.8rem; color: #666; margin-bottom: 8px;">Timer Duration</p>
-      <div style="display: flex; gap: 8px; align-items: center;">
-        <button class="btn btn-ghost dur-btn" onclick="setDuration(120)">2 min</button>
-        <button class="btn btn-ghost dur-btn active-diff" onclick="setDuration(180)">3 min</button>
-        <button class="btn btn-ghost dur-btn" onclick="setDuration(300)">5 min</button>
-        <button class="btn btn-ghost" id="start-timer-btn" onclick="startTimer()" style="margin-left: 4px;">▶ Start Timer</button>
+      <p style="font-size: 0.8rem; color: var(--text-label); margin-bottom: 8px;" data-i18n="label_language">Language</p>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button class="btn btn-ghost lang-btn active-diff" onclick="setLanguage('English')">English</button>
+        <button class="btn btn-ghost lang-btn" onclick="setLanguage('Spanish')">Español</button>
+        <button class="btn btn-ghost lang-btn" onclick="setLanguage('French')">Français</button>
+        <button class="btn btn-ghost lang-btn" onclick="setLanguage('German')">Deutsch</button>
+        <button class="btn btn-ghost lang-btn" onclick="setLanguage('Turkish')">Türkçe</button>
+        <button class="btn btn-ghost lang-btn" onclick="setLanguage('Russian')">Русский</button>
       </div>
     </div>
 
-    <!-- Countdown display (hidden until timer starts) -->
+    <!-- Timer -->
+    <div style="margin-bottom: 1rem;">
+      <p style="font-size: 0.8rem; color: var(--text-label); margin-bottom: 8px;" data-i18n="label_timer">Timer Duration</p>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button class="btn btn-ghost dur-btn" onclick="setDuration(120)" data-i18n="dur_2">2 min</button>
+        <button class="btn btn-ghost dur-btn active-diff" onclick="setDuration(180)" data-i18n="dur_3">3 min</button>
+        <button class="btn btn-ghost dur-btn" onclick="setDuration(300)" data-i18n="dur_5">5 min</button>
+        <button class="btn btn-ghost" id="start-timer-btn" onclick="startTimer()" style="margin-left: 4px;" data-i18n="btn_start_timer">▶ Start Timer</button>
+      </div>
+    </div>
+
+    <!-- Countdown -->
     <div class="timer-display" id="timer-display">
       <span class="timer-clock" id="timer-clock">3:00</span>
-      <div class="timer-bar-wrap">
-        <div class="timer-bar" id="timer-bar"></div>
-      </div>
-      <span class="timer-label" id="timer-label">Time remaining</span>
+      <div class="timer-bar-wrap"><div class="timer-bar" id="timer-bar"></div></div>
+      <span class="timer-label" id="timer-label" data-i18n="timer_remaining">Time remaining</span>
     </div>
 
-    <div class="question-box" id="question-text">Loading question...</div>
-    <textarea id="answer-input" placeholder="Type your answer here..."></textarea>
+    <div class="question-box" id="question-text" data-i18n="loading_question">Loading question...</div>
+
+    <!-- Answer tabs — only shown for technical -->
+    <div class="answer-tabs" id="answer-tabs" style="display:none;">
+      <button class="tab-btn active-tab" onclick="switchTab('text')" data-i18n="tab_text">📝 Text Answer</button>
+      <button class="tab-btn" onclick="switchTab('code')" data-i18n="tab_code">💻 Code Editor</button>
+    </div>
+
+    <div id="text-answer-wrap">
+      <textarea id="answer-input" data-i18n-placeholder="placeholder_answer" placeholder="Type your answer here..."></textarea>
+    </div>
+
+    <div id="code-editor-wrap">
+      <div id="monaco-editor" style="height: 240px;"></div>
+    </div>
+
     <div class="btn-row">
-      <button class="btn btn-primary" id="submit-btn" onclick="submitAnswer()">Get Feedback</button>
-      <button class="btn btn-ghost" onclick="goHome()">← Back</button>
+      <button class="btn btn-primary" id="submit-btn" onclick="submitAnswer()" data-i18n="btn_feedback">Get Feedback</button>
+      <button class="btn btn-ghost" onclick="goHome()" data-i18n="btn_back">← Back</button>
     </div>
     <div class="loading" id="loading-feedback">
       <div class="spinner"></div>
-      Analyzing your answer...
+      <span data-i18n="loading_analyzing">Analyzing your answer...</span>
     </div>
   </div>
 
   <!-- Screen 3: Feedback -->
   <div class="screen" id="screen-feedback">
-    <h1>Your Feedback</h1>
-    <p class="subtitle">Here's how you did and how to improve.</p>
+    <h1 data-i18n="feedback_title">Your Feedback</h1>
+    <p class="subtitle" data-i18n="feedback_subtitle">Here's how you did and how to improve.</p>
     <div class="score-badge" id="score-display">–/10</div>
-    <div class="score-label">Overall score</div>
+    <div class="score-label" data-i18n="score_label">Overall score</div>
     <div class="feedback-box" id="feedback-content"></div>
     <div class="btn-row" style="margin-top: 1.5rem;">
-      <button class="btn btn-primary" onclick="tryAgain()">Try Another Question</button>
-      <button class="btn btn-ghost" onclick="showScreen('screen-home')">← Home</button>
+      <button class="btn btn-primary" onclick="tryAgain()" data-i18n="btn_try_again">Try Another Question</button>
+      <button class="btn btn-ghost" onclick="showScreen('screen-home')" data-i18n="btn_home">← Home</button>
     </div>
   </div>
 
   <!-- Screen 4: History -->
   <div class="screen" id="screen-history">
-    <h1>Your History</h1>
-    <p class="subtitle">Your past interviews and feedback — click a card to expand</p>
+    <h1 data-i18n="history_title">Your History</h1>
+    <p class="subtitle" data-i18n="history_subtitle">Your past interviews and feedback — click a card to expand</p>
     <div id="history-list"></div>
-    <button onclick="showScreen('screen-home')" class="btn btn-ghost">← Back to Home</button>
+    <button onclick="showScreen('screen-home')" class="btn btn-ghost" data-i18n="btn_back_home">← Back to Home</button>
   </div>
 
   <!-- Screen 5: Stats -->
   <div class="screen" id="screen-stats">
-    <h1>Your Stats</h1>
-    <p class="subtitle">Your performance across all sessions.</p>
+    <h1 data-i18n="stats_title">Your Stats</h1>
+    <p class="subtitle" data-i18n="stats_subtitle">Your performance across all sessions.</p>
     <div class="stats-grid">
       <div class="stat-card">
         <span class="stat-value" id="stat-total">–</span>
-        <span class="stat-label">Total Sessions</span>
+        <span class="stat-label" data-i18n="stat_total">Total Sessions</span>
       </div>
       <div class="stat-card">
         <span class="stat-value" id="stat-avg">–</span>
-        <span class="stat-label">Avg Score</span>
+        <span class="stat-label" data-i18n="stat_avg">Avg Score</span>
       </div>
       <div class="stat-card">
         <span class="stat-value" id="stat-best">–</span>
-        <span class="stat-label">Best Category</span>
+        <span class="stat-label" data-i18n="stat_best">Best Category</span>
       </div>
     </div>
-    <button onclick="showScreen('screen-home')" class="btn btn-ghost">← Back to Home</button>
+    <button onclick="showScreen('screen-home')" class="btn btn-ghost" data-i18n="btn_back_home">← Back to Home</button>
   </div>
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
 <script>
+  /* ── Translations ── */
+  const translations = {
+    English: {
+      home_title: "Mock Interview Coach",
+      home_subtitle: "Pick a category and practice with AI-powered feedback.",
+      type_behavioral: "Behavioral", type_behavioral_desc: "STAR format questions",
+      type_technical: "Technical", type_technical_desc: "DSA & Python questions",
+      type_intro: "Introduction", type_intro_desc: "Tell me about yourself",
+      btn_history: "📋 View History", btn_stats: "📊 View Stats",
+      question_title: "Your Question",
+      question_subtitle: "Read carefully and answer as you would in a real interview.",
+      label_difficulty: "Difficulty", label_language: "Language", label_timer: "Timer Duration",
+      diff_junior: "Junior", diff_intermediate: "Intermediate", diff_senior: "Senior",
+      dur_2: "2 min", dur_3: "3 min", dur_5: "5 min",
+      btn_start_timer: "▶ Start Timer", timer_remaining: "Time remaining",
+      loading_question: "Loading question...",
+      tab_text: "📝 Text Answer", tab_code: "💻 Code Editor",
+      placeholder_answer: "Type your answer here...",
+      btn_feedback: "Get Feedback", btn_back: "← Back",
+      loading_analyzing: "Analyzing your answer...",
+      feedback_title: "Your Feedback",
+      feedback_subtitle: "Here's how you did and how to improve.",
+      score_label: "Overall score",
+      btn_try_again: "Try Another Question", btn_home: "← Home",
+      history_title: "Your History",
+      history_subtitle: "Your past interviews and feedback — click a card to expand",
+      btn_back_home: "← Back to Home",
+      stats_title: "Your Stats",
+      stats_subtitle: "Your performance across all sessions.",
+      stat_total: "Total Sessions", stat_avg: "Avg Score", stat_best: "Best Category",
+      expand_hint: "Click to see full feedback ↓", collapse_hint: "Click to collapse ↑",
+      no_sessions: "No interviews yet. Start your first session!",
+      times_up: "Time's up!",
+    },
+    Spanish: {
+      home_title: "Entrenador de Entrevistas",
+      home_subtitle: "Elige una categoría y practica con retroalimentación de IA.",
+      type_behavioral: "Conductual", type_behavioral_desc: "Preguntas formato STAR",
+      type_technical: "Técnico", type_technical_desc: "Preguntas de DSA y Python",
+      type_intro: "Introducción", type_intro_desc: "Háblame de ti",
+      btn_history: "📋 Ver Historial", btn_stats: "📊 Ver Estadísticas",
+      question_title: "Tu Pregunta",
+      question_subtitle: "Lee con cuidado y responde como en una entrevista real.",
+      label_difficulty: "Dificultad", label_language: "Idioma", label_timer: "Duración del Temporizador",
+      diff_junior: "Junior", diff_intermediate: "Intermedio", diff_senior: "Senior",
+      dur_2: "2 min", dur_3: "3 min", dur_5: "5 min",
+      btn_start_timer: "▶ Iniciar Temporizador", timer_remaining: "Tiempo restante",
+      loading_question: "Cargando pregunta...",
+      tab_text: "📝 Respuesta de texto", tab_code: "💻 Editor de código",
+      placeholder_answer: "Escribe tu respuesta aquí...",
+      btn_feedback: "Obtener Retroalimentación", btn_back: "← Atrás",
+      loading_analyzing: "Analizando tu respuesta...",
+      feedback_title: "Tu Retroalimentación",
+      feedback_subtitle: "Así te fue y cómo mejorar.",
+      score_label: "Puntuación general",
+      btn_try_again: "Intentar otra pregunta", btn_home: "← Inicio",
+      history_title: "Tu Historial",
+      history_subtitle: "Tus entrevistas pasadas — haz clic para expandir",
+      btn_back_home: "← Volver al Inicio",
+      stats_title: "Tus Estadísticas",
+      stats_subtitle: "Tu rendimiento en todas las sesiones.",
+      stat_total: "Sesiones totales", stat_avg: "Puntuación media", stat_best: "Mejor categoría",
+      expand_hint: "Clic para ver retroalimentación ↓", collapse_hint: "Clic para colapsar ↑",
+      no_sessions: "Sin entrevistas aún. ¡Comienza tu primera sesión!",
+      times_up: "¡Tiempo agotado!",
+    },
+    French: {
+      home_title: "Coach d'Entretien",
+      home_subtitle: "Choisissez une catégorie et pratiquez avec des retours IA.",
+      type_behavioral: "Comportemental", type_behavioral_desc: "Questions format STAR",
+      type_technical: "Technique", type_technical_desc: "Questions DSA & Python",
+      type_intro: "Introduction", type_intro_desc: "Parlez-moi de vous",
+      btn_history: "📋 Voir l'Historique", btn_stats: "📊 Voir les Stats",
+      question_title: "Votre Question",
+      question_subtitle: "Lisez attentivement et répondez comme en vrai entretien.",
+      label_difficulty: "Difficulté", label_language: "Langue", label_timer: "Durée du minuteur",
+      diff_junior: "Junior", diff_intermediate: "Intermédiaire", diff_senior: "Senior",
+      dur_2: "2 min", dur_3: "3 min", dur_5: "5 min",
+      btn_start_timer: "▶ Démarrer", timer_remaining: "Temps restant",
+      loading_question: "Chargement de la question...",
+      tab_text: "📝 Réponse texte", tab_code: "💻 Éditeur de code",
+      placeholder_answer: "Tapez votre réponse ici...",
+      btn_feedback: "Obtenir un retour", btn_back: "← Retour",
+      loading_analyzing: "Analyse de votre réponse...",
+      feedback_title: "Votre Retour",
+      feedback_subtitle: "Voici comment vous avez fait et comment vous améliorer.",
+      score_label: "Score global",
+      btn_try_again: "Essayer une autre question", btn_home: "← Accueil",
+      history_title: "Votre Historique",
+      history_subtitle: "Vos entretiens passés — cliquez pour développer",
+      btn_back_home: "← Retour à l'accueil",
+      stats_title: "Vos Statistiques",
+      stats_subtitle: "Vos performances sur toutes les sessions.",
+      stat_total: "Sessions totales", stat_avg: "Score moyen", stat_best: "Meilleure catégorie",
+      expand_hint: "Cliquez pour voir le retour ↓", collapse_hint: "Cliquez pour réduire ↑",
+      no_sessions: "Pas encore d'entretiens. Commencez votre première session !",
+      times_up: "Temps écoulé !",
+    },
+    German: {
+      home_title: "Interview-Coach",
+      home_subtitle: "Wähle eine Kategorie und übe mit KI-Feedback.",
+      type_behavioral: "Verhaltensbasiert", type_behavioral_desc: "STAR-Format Fragen",
+      type_technical: "Technisch", type_technical_desc: "DSA & Python Fragen",
+      type_intro: "Einführung", type_intro_desc: "Erzähl mir von dir",
+      btn_history: "📋 Verlauf ansehen", btn_stats: "📊 Statistiken ansehen",
+      question_title: "Deine Frage",
+      question_subtitle: "Lies sorgfältig und antworte wie in einem echten Interview.",
+      label_difficulty: "Schwierigkeit", label_language: "Sprache", label_timer: "Timer-Dauer",
+      diff_junior: "Junior", diff_intermediate: "Mittel", diff_senior: "Senior",
+      dur_2: "2 Min", dur_3: "3 Min", dur_5: "5 Min",
+      btn_start_timer: "▶ Timer starten", timer_remaining: "Verbleibende Zeit",
+      loading_question: "Frage wird geladen...",
+      tab_text: "📝 Textantwort", tab_code: "💻 Code-Editor",
+      placeholder_answer: "Schreibe deine Antwort hier...",
+      btn_feedback: "Feedback erhalten", btn_back: "← Zurück",
+      loading_analyzing: "Antwort wird analysiert...",
+      feedback_title: "Dein Feedback",
+      feedback_subtitle: "So hast du abgeschnitten und wie du dich verbessern kannst.",
+      score_label: "Gesamtpunktzahl",
+      btn_try_again: "Andere Frage versuchen", btn_home: "← Startseite",
+      history_title: "Dein Verlauf",
+      history_subtitle: "Deine vergangenen Interviews — zum Erweitern klicken",
+      btn_back_home: "← Zurück zur Startseite",
+      stats_title: "Deine Statistiken",
+      stats_subtitle: "Deine Leistung über alle Sitzungen.",
+      stat_total: "Sitzungen gesamt", stat_avg: "Durchschnittspunktzahl", stat_best: "Beste Kategorie",
+      expand_hint: "Klicken für vollständiges Feedback ↓", collapse_hint: "Klicken zum Einklappen ↑",
+      no_sessions: "Noch keine Interviews. Starte deine erste Sitzung!",
+      times_up: "Zeit abgelaufen!",
+    },
+    Turkish: {
+      home_title: "Mülakat Koçu",
+      home_subtitle: "Bir kategori seç ve yapay zeka destekli geri bildirimle pratik yap.",
+      type_behavioral: "Davranışsal", type_behavioral_desc: "STAR format sorular",
+      type_technical: "Teknik", type_technical_desc: "DSA & Python soruları",
+      type_intro: "Tanışma", type_intro_desc: "Kendinden bahset",
+      btn_history: "📋 Geçmişi Gör", btn_stats: "📊 İstatistikleri Gör",
+      question_title: "Sorunuz",
+      question_subtitle: "Dikkatlice oku ve gerçek bir mülakata gibi cevapla.",
+      label_difficulty: "Zorluk", label_language: "Dil", label_timer: "Zamanlayıcı Süresi",
+      diff_junior: "Junior", diff_intermediate: "Orta", diff_senior: "Senior",
+      dur_2: "2 dk", dur_3: "3 dk", dur_5: "5 dk",
+      btn_start_timer: "▶ Zamanlayıcıyı Başlat", timer_remaining: "Kalan süre",
+      loading_question: "Soru yükleniyor...",
+      tab_text: "📝 Metin Cevabı", tab_code: "💻 Kod Editörü",
+      placeholder_answer: "Cevabını buraya yaz...",
+      btn_feedback: "Geri Bildirim Al", btn_back: "← Geri",
+      loading_analyzing: "Cevabın analiz ediliyor...",
+      feedback_title: "Geri Bildiriminiz",
+      feedback_subtitle: "Nasıl gittiği ve nasıl gelişebileceğin.",
+      score_label: "Genel puan",
+      btn_try_again: "Başka soru dene", btn_home: "← Ana Sayfa",
+      history_title: "Geçmişiniz",
+      history_subtitle: "Geçmiş mülakatlarınız — genişletmek için tıklayın",
+      btn_back_home: "← Ana Sayfaya Dön",
+      stats_title: "İstatistikleriniz",
+      stats_subtitle: "Tüm oturumlardaki performansınız.",
+      stat_total: "Toplam oturum", stat_avg: "Ortalama puan", stat_best: "En iyi kategori",
+      expand_hint: "Tam geri bildirimi görmek için tıklayın ↓", collapse_hint: "Daraltmak için tıklayın ↑",
+      no_sessions: "Henüz mülakat yok. İlk oturumunu başlat!",
+      times_up: "Süre doldu!",
+    },
+    Russian: {
+      home_title: "Тренер по собеседованиям",
+      home_subtitle: "Выберите категорию и практикуйтесь с обратной связью от ИИ.",
+      type_behavioral: "Поведенческое", type_behavioral_desc: "Вопросы в формате STAR",
+      type_technical: "Техническое", type_technical_desc: "Вопросы по DSA и Python",
+      type_intro: "Знакомство", type_intro_desc: "Расскажите о себе",
+      btn_history: "📋 История", btn_stats: "📊 Статистика",
+      question_title: "Ваш вопрос",
+      question_subtitle: "Читайте внимательно и отвечайте как на настоящем собеседовании.",
+      label_difficulty: "Сложность", label_language: "Язык", label_timer: "Продолжительность таймера",
+      diff_junior: "Junior", diff_intermediate: "Средний", diff_senior: "Senior",
+      dur_2: "2 мин", dur_3: "3 мин", dur_5: "5 мин",
+      btn_start_timer: "▶ Запустить таймер", timer_remaining: "Оставшееся время",
+      loading_question: "Загрузка вопроса...",
+      tab_text: "📝 Текстовый ответ", tab_code: "💻 Редактор кода",
+      placeholder_answer: "Введите ваш ответ здесь...",
+      btn_feedback: "Получить обратную связь", btn_back: "← Назад",
+      loading_analyzing: "Анализ вашего ответа...",
+      feedback_title: "Обратная связь",
+      feedback_subtitle: "Как вы справились и как улучшиться.",
+      score_label: "Общий балл",
+      btn_try_again: "Попробовать другой вопрос", btn_home: "← Главная",
+      history_title: "Ваша история",
+      history_subtitle: "Прошлые собеседования — нажмите для раскрытия",
+      btn_back_home: "← На главную",
+      stats_title: "Ваша статистика",
+      stats_subtitle: "Ваши результаты по всем сессиям.",
+      stat_total: "Всего сессий", stat_avg: "Средний балл", stat_best: "Лучшая категория",
+      expand_hint: "Нажмите для полной обратной связи ↓", collapse_hint: "Нажмите для сворачивания ↑",
+      no_sessions: "Нет интервью. Начните свою первую сессию!",
+      times_up: "Время вышло!",
+    }
+  };
+
+  function t(key) {
+    return translations[currentLanguage][key] || translations['English'][key] || key;
+  }
+
+  function applyTranslations() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      el.textContent = t(key);
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      el.placeholder = t(key);
+    });
+  }
+
+  /* ── State ── */
   let currentType       = '';
   let currentQuestion   = '';
   let currentDifficulty = 'intermediate';
-  let currentDuration   = 180;   // default 3 min in seconds
+  let currentDuration   = 180;
   let timerInterval     = null;
   let timeLeft          = 0;
+  let currentLanguage   = 'English';
+  let monacoEditor      = null;
+  let monacoReady       = false;
+  let activeTab         = 'text';
+
+  /* ── Monaco setup ── */
+  require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs' }});
+  require(['vs/editor/editor.main'], function() {
+    monacoEditor = monaco.editor.create(document.getElementById('monaco-editor'), {
+      value: '# Write your code here\n',
+      language: 'python',
+      theme: 'vs-dark',
+      minimap: { enabled: false },
+      fontSize: 14,
+      lineNumbers: 'on',
+      scrollBeyondLastLine: false,
+      automaticLayout: true,
+    });
+    monacoReady = true;
+  });
+
+  /* ── Theme toggle ── */
+  function toggleTheme() {
+    const html = document.documentElement;
+    const btn = document.getElementById('theme-btn');
+    if (html.getAttribute('data-theme') === 'light') {
+      html.removeAttribute('data-theme');
+      btn.textContent = '☀️ Light mode';
+      if (monacoReady) monaco.editor.setTheme('vs-dark');
+    } else {
+      html.setAttribute('data-theme', 'light');
+      btn.textContent = '🌙 Dark mode';
+      if (monacoReady) monaco.editor.setTheme('vs');
+    }
+  }
+
+  /* ── Tab switching ── */
+  function switchTab(tab) {
+    activeTab = tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-tab'));
+    event.target.classList.add('active-tab');
+
+    if (tab === 'code') {
+      document.getElementById('text-answer-wrap').classList.add('hidden');
+      document.getElementById('code-editor-wrap').classList.add('visible');
+      if (monacoReady) monacoEditor.layout();
+    } else {
+      document.getElementById('text-answer-wrap').classList.remove('hidden');
+      document.getElementById('code-editor-wrap').classList.remove('visible');
+    }
+  }
 
   /* ── Helpers ── */
   function showScreen(id) {
@@ -492,10 +773,7 @@
   }
 
   function stopTimer() {
-    if (timerInterval) {
-      clearInterval(timerInterval);
-      timerInterval = null;
-    }
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
   }
 
   /* ── Difficulty ── */
@@ -506,76 +784,73 @@
     startInterview(currentType);
   }
 
+  /* ── Language ── */
+  function setLanguage(lang) {
+    currentLanguage = lang;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active-diff'));
+    event.target.classList.add('active-diff');
+    applyTranslations();
+    if (currentType) startInterview(currentType);
+  }
+
   /* ── Timer duration ── */
   function setDuration(seconds) {
     currentDuration = seconds;
     document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('active-diff'));
     event.target.classList.add('active-diff');
-
-    // Reset the clock preview to the new duration without starting
     document.getElementById('timer-clock').textContent = formatTime(seconds);
     document.getElementById('timer-clock').className = 'timer-clock';
     document.getElementById('timer-bar').style.width = '100%';
     document.getElementById('timer-bar').className = 'timer-bar';
-
     stopTimer();
-    document.getElementById('start-timer-btn').textContent = '▶ Start Timer';
+    document.getElementById('start-timer-btn').textContent = t('btn_start_timer');
     document.getElementById('start-timer-btn').disabled = false;
   }
 
   /* ── Start timer ── */
   function startTimer() {
-    stopTimer(); // clear any existing timer first
-
+    stopTimer();
     timeLeft = currentDuration;
     const totalTime = currentDuration;
-
-    const display   = document.getElementById('timer-display');
-    const clock     = document.getElementById('timer-clock');
-    const bar       = document.getElementById('timer-bar');
-    const startBtn  = document.getElementById('start-timer-btn');
+    const display  = document.getElementById('timer-display');
+    const clock    = document.getElementById('timer-clock');
+    const bar      = document.getElementById('timer-bar');
+    const startBtn = document.getElementById('start-timer-btn');
 
     display.classList.add('visible');
     startBtn.textContent = '⏸ Running…';
     startBtn.disabled = true;
-
-    // Tick immediately so display is fresh on start
     clock.textContent = formatTime(timeLeft);
 
     timerInterval = setInterval(() => {
       timeLeft--;
-
       const pct = (timeLeft / totalTime) * 100;
       clock.textContent = formatTime(timeLeft);
       bar.style.width = pct + '%';
 
-      // Colour states: warning < 33%, danger < 15%
-      const warningThreshold = totalTime * 0.33;
-      const dangerThreshold  = totalTime * 0.15;
-
-      if (timeLeft <= dangerThreshold) {
+      if (timeLeft <= totalTime * 0.15) {
         clock.className = 'timer-clock danger';
-        bar.className   = 'timer-bar danger';
-      } else if (timeLeft <= warningThreshold) {
+        bar.className = 'timer-bar danger';
+      } else if (timeLeft <= totalTime * 0.33) {
         clock.className = 'timer-clock warning';
-        bar.className   = 'timer-bar warning';
+        bar.className = 'timer-bar warning';
       }
 
       if (timeLeft <= 0) {
         stopTimer();
         clock.textContent = '0:00';
         bar.style.width = '0%';
-        document.getElementById('timer-label').textContent = "Time's up!";
+        document.getElementById('timer-label').textContent = t('times_up');
         submitAnswer();
       }
     }, 1000);
   }
 
-  /* ── Navigation: back from question screen ── */
+  /* ── Navigation ── */
   function goHome() {
     stopTimer();
     document.getElementById('timer-display').classList.remove('visible');
-    document.getElementById('start-timer-btn').textContent = '▶ Start Timer';
+    document.getElementById('start-timer-btn').textContent = t('btn_start_timer');
     document.getElementById('start-timer-btn').disabled = false;
     showScreen('screen-home');
   }
@@ -585,35 +860,58 @@
     currentType = type;
     stopTimer();
 
-    // Reset timer UI
-    const display = document.getElementById('timer-display');
-    display.classList.remove('visible');
+    document.getElementById('timer-display').classList.remove('visible');
     document.getElementById('timer-clock').textContent = formatTime(currentDuration);
     document.getElementById('timer-clock').className = 'timer-clock';
     document.getElementById('timer-bar').style.width = '100%';
     document.getElementById('timer-bar').className = 'timer-bar';
-    document.getElementById('timer-label').textContent = 'Time remaining';
-    document.getElementById('start-timer-btn').textContent = '▶ Start Timer';
+    document.getElementById('timer-label').textContent = t('timer_remaining');
+    document.getElementById('start-timer-btn').textContent = t('btn_start_timer');
     document.getElementById('start-timer-btn').disabled = false;
+
+    // Show code editor tabs only for technical
+    const tabs = document.getElementById('answer-tabs');
+    if (type === 'technical') {
+      tabs.style.display = 'flex';
+    } else {
+      tabs.style.display = 'none';
+      switchToTextTab();
+    }
 
     showScreen('screen-question');
     document.getElementById('question-tag').textContent = type;
-    document.getElementById('question-text').textContent = 'Loading question...';
+    document.getElementById('question-text').textContent = t('loading_question');
     document.getElementById('answer-input').value = '';
+    if (monacoReady) monacoEditor.setValue('# Write your code here\n');
     document.getElementById('submit-btn').disabled = false;
 
-    const res = await fetch(`/question/${type}?difficulty=${currentDifficulty}`);
+    const res = await fetch(`/question/${type}?difficulty=${currentDifficulty}&language=${currentLanguage}`);
     const data = await res.json();
     currentQuestion = data.question;
     document.getElementById('question-text').textContent = data.question;
   }
 
-  async function submitAnswer() {
-    stopTimer(); // stop timer if it's still running
+  function switchToTextTab() {
+    activeTab = 'text';
+    document.querySelectorAll('.tab-btn').forEach((b, i) => {
+      b.classList.toggle('active-tab', i === 0);
+    });
+    document.getElementById('text-answer-wrap').classList.remove('hidden');
+    document.getElementById('code-editor-wrap').classList.remove('visible');
+  }
 
-    const answer = document.getElementById('answer-input').value.trim();
-    if (!answer) {
-      alert('Please type your answer first!');
+  async function submitAnswer() {
+    stopTimer();
+
+    let answer = '';
+    if (activeTab === 'code' && monacoReady) {
+      answer = monacoEditor.getValue().trim();
+    } else {
+      answer = document.getElementById('answer-input').value.trim();
+    }
+
+    if (!answer || answer === '# Write your code here') {
+      alert(t('placeholder_answer'));
       return;
     }
 
@@ -626,7 +924,8 @@
       body: JSON.stringify({
         question: currentQuestion,
         answer: answer,
-        interview_type: currentType
+        interview_type: currentType,
+        language: currentLanguage
       })
     });
 
@@ -641,13 +940,10 @@
     showScreen('screen-feedback');
   }
 
-  function tryAgain() {
-    startInterview(currentType);
-  }
+  function tryAgain() { startInterview(currentType); }
 
   async function loadHistory() {
     showScreen('screen-history');
-
     try {
       const res = await fetch("/history");
       const sessions = await res.json();
@@ -655,38 +951,30 @@
       container.innerHTML = "";
 
       if (sessions.length === 0) {
-        container.innerHTML = `<p class="subtitle">No interviews yet. Start your first session!</p>`;
+        container.innerHTML = `<p class="subtitle">${t('no_sessions')}</p>`;
         return;
       }
 
       sessions.forEach(session => {
         const item = document.createElement("div");
         item.className = "history-card";
-
         item.innerHTML = `
           <h3>${session.question}</h3>
           <p><strong>Type:</strong> ${session.interview_type}</p>
           <p><strong>Score:</strong> ${session.score}/10</p>
           <p><strong>Date:</strong> ${new Date(session.created_at).toLocaleDateString()}</p>
           <p class="preview">${session.feedback.substring(0, 150)}...</p>
-          <p class="expand-hint">Click to see full feedback ↓</p>
-          <div class="feedback-detail">
-            ${marked.parse(session.feedback)}
-          </div>
+          <p class="expand-hint">${t('expand_hint')}</p>
+          <div class="feedback-detail">${marked.parse(session.feedback)}</div>
         `;
-
         item.onclick = () => {
           const detail = item.querySelector(".feedback-detail");
           const hint = item.querySelector(".expand-hint");
           detail.classList.toggle("expanded");
-          hint.textContent = detail.classList.contains("expanded")
-            ? "Click to collapse ↑"
-            : "Click to see full feedback ↓";
+          hint.textContent = detail.classList.contains("expanded") ? t('collapse_hint') : t('expand_hint');
         };
-
         container.appendChild(item);
       });
-
     } catch (error) {
       console.error("Failed to load history:", error);
     }
@@ -694,7 +982,6 @@
 
   async function loadStats() {
     showScreen('screen-stats');
-
     try {
       const res = await fetch("/stats");
       const data = await res.json();
