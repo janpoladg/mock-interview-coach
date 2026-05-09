@@ -3,12 +3,15 @@
 An AI-powered interview practice tool that generates questions and gives instant feedback on your answers.
 
 ## Features
-- 3 interview types: Behavioral, Technical, and Introduction
-- AI-generated questions on every session
-- Instant structured feedback with score, strengths, and improvements
-- Clean single-page UI
-- History with all relative details
-- Stats with number of sessions, average score, and best category
+
+- Behavioral, Technical, and Introduction interview modes
+- Junior / Intermediate / Senior difficulty levels
+- Full multilingual UI (6 languages)
+- Monaco code editor for technical interviews
+- AI-generated interview questions
+- Instant AI feedback with scoring and improvement tips
+- Session history and statistics dashboard
+- Dark / light theme support
 
 ## Tech Stack
 - **Backend:** Python, FastAPI
