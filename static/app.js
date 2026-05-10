@@ -37,6 +37,12 @@
       cat_behavioral: "Behavioral",
       cat_technical: "Technical",
       cat_intro: "Introduction",
+      cv_upload_title: "Upload CV (optional)",
+      cv_btn: "📎 Choose PDF or DOCX",
+      cv_no_file: "No file uploaded",
+      cv_success: "✓ CV uploaded successfully",
+      cv_error: "✗ Failed to extract text",
+      job_desc_placeholder: "Paste job description here (optional)...",
     },
     Spanish: {
       home_title: "Entrenador de Entrevistas",
@@ -75,6 +81,9 @@
       cat_behavioral: "Conductual",
       cat_technical: "Técnico",
       cat_intro: "Introducción",
+      cv_upload_title: "Subir CV (opcional)", cv_btn: "📎 Elegir PDF o DOCX",
+      cv_no_file: "Ningún archivo subido", cv_success: "✓ CV subido correctamente",
+      cv_error: "✗ Error al extraer texto", job_desc_placeholder: "Pega la descripción del trabajo aquí (opcional)...",
     },
     French: {
       home_title: "Coach d'Entretien",
@@ -113,6 +122,9 @@
       cat_behavioral: "Comportemental",
       cat_technical: "Technique",
       cat_intro: "Introduction",
+      cv_upload_title: "Télécharger CV (optionnel)", cv_btn: "📎 Choisir PDF ou DOCX",
+      cv_no_file: "Aucun fichier téléchargé", cv_success: "✓ CV téléchargé avec succès",
+      cv_error: "✗ Échec de l'extraction", job_desc_placeholder: "Collez la description du poste ici (optionnel)...",
     },
     German: {
       home_title: "Interview-Coach",
@@ -151,6 +163,9 @@
       cat_behavioral: "Verhaltensbasiert",
       cat_technical: "Technisch",
       cat_intro: "Einführung",
+      cv_upload_title: "Lebenslauf hochladen (optional)", cv_btn: "📎 PDF oder DOCX wählen",
+      cv_no_file: "Keine Datei hochgeladen", cv_success: "✓ Lebenslauf erfolgreich hochgeladen",
+      cv_error: "✗ Textextraktion fehlgeschlagen", job_desc_placeholder: "Stellenbeschreibung hier einfügen (optional)...",
     },
     Turkish: {
       home_title: "Mülakat Koçu",
@@ -189,6 +204,9 @@
       cat_behavioral: "Davranışsal",
       cat_technical: "Teknik",
       cat_intro: "Tanışma",
+      cv_upload_title: "CV Yükle (isteğe bağlı)", cv_btn: "📎 PDF veya DOCX Seç",
+      cv_no_file: "Dosya yüklenmedi", cv_success: "✓ CV başarıyla yüklendi",
+      cv_error: "✗ Metin çıkarılamadı", job_desc_placeholder: "İş tanımını buraya yapıştırın (isteğe bağlı)...",
     },
     Russian: {
       home_title: "Тренер по собеседованиям",
@@ -227,6 +245,9 @@
       cat_behavioral: "Поведенческое",
       cat_technical: "Техническое",
       cat_intro: "Знакомство",
+      cv_upload_title: "Загрузить резюме (необязательно)", cv_btn: "📎 Выбрать PDF или DOCX",
+      cv_no_file: "Файл не загружен", cv_success: "✓ Резюме успешно загружено",
+      cv_error: "✗ Не удалось извлечь текст", job_desc_placeholder: "Вставьте описание вакансии здесь (необязательно)...",
     }
   };
 
@@ -256,7 +277,8 @@
   let monacoEditor      = null;
   let monacoReady       = false;
   let activeTab         = 'text';
-
+  let cvText = '';
+  let jobDescription = '';
   /* ── Monaco setup ── */
   require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs' }});
   require(['vs/editor/editor.main'], function() {
@@ -334,6 +356,27 @@
     applyTranslations();
     if (currentType) startInterview(currentType);
    }
+   /* Upload CV function */
+  async function uploadCV(file) {
+    const formData = new FormData();
+    formData.append('file',file);
+
+    const res = await fetch('/upload', {
+        method: 'POST',
+        body: formData
+    });
+
+    const data = await res.json();
+    if (data.cv_text) {
+        cvText = data.cv_text;
+        document.getElementById('cv-status').textContent = t('cv_success');
+        document.getElementById('cv-status').style.color ='#22c55e';
+
+    }else {
+        document.getElementById('cv-status').textContent = t('cv_error');
+        document.getElementById('cv-status').style.color = '#ef4444';
+    }
+  }
 
   /* ── Timer duration ── */
   function setDuration(seconds) {
@@ -398,9 +441,12 @@
   }
 
   /* ── Interview flow ── */
-  async function startInterview(type) {
+ async function startInterview(type) {
     currentType = type;
     stopTimer();
+
+    // Capture job description before switching screens
+    jobDescription = document.getElementById('job-description').value.trim();
 
     document.getElementById('timer-display').classList.remove('visible');
     document.getElementById('timer-clock').textContent = formatTime(currentDuration);
@@ -427,7 +473,17 @@
     if (monacoReady) monacoEditor.setValue('# Write your code here\n');
     document.getElementById('submit-btn').disabled = false;
 
-    const res = await fetch(`/question/${type}?difficulty=${currentDifficulty}&language=${currentLanguage}`);
+    const res = await fetch('/question', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        interview_type: type,
+        difficulty: currentDifficulty,
+        language: currentLanguage,
+        cv_text: cvText || null,
+        job_description: jobDescription || null
+      })
+    });
     const data = await res.json();
     currentQuestion = data.question;
     document.getElementById('question-text').textContent = data.question;

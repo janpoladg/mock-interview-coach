@@ -7,7 +7,8 @@ import re
 from app.database import get_db
 from app.database import SessionLocal
 from app.models import InterviewSession
-from app.schemas import AnswerRequest
+from app.schemas import AnswerRequest, QuestionRequest
+from typing import Optional
 
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -15,13 +16,23 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 router = APIRouter()
 
 
-def build_question_prompt(interview_type: str, difficulty: str = "intermediate", language: str = "English") -> str:
+def build_question_prompt(interview_type: str, difficulty: str = "intermediate", language: str = "English", cv_text: Optional[str] = None, job_description: Optional[str] = None) -> str:
+    
+    context = ""
+    if cv_text or job_description:
+        context = "\n\nAdditional context to personalize the question:"
+        if cv_text:
+            context += f"\nCandidate CV: {cv_text[:1000]}"
+        if job_description:
+            context += f"\nJob description: {job_description[:500]}"
+        context += "\nUse this context to make the question specific and relevant to this candidate and role."
+
     prompts = {
-        "behavioral": f"Generate a single {difficulty} level behavioral interview question that tests teamwork, leadership, or handling failure. Just the question, nothing else. In {language} language",
-        "technical": f"Generate a single {difficulty} level technical interview question about Python, data structures, or algorithms. Just the question, nothing else.In {language} language",
-        "intro": f"Generate a single {difficulty} level interview question from the 'getting to know you' category. Just the question, nothing else.In {language} language",
+        "behavioral": f"Generate a single {difficulty} level behavioral interview question that tests teamwork, leadership, or handling failure. Just the question, nothing else. In {language} language.{context}",
+        "technical": f"Generate a single {difficulty} level technical interview question about Python, data structures, or algorithms. Just the question, nothing else. In {language} language.{context}",
+        "intro": f"Generate a single {difficulty} level interview question from the 'getting to know you' category. Just the question, nothing else. In {language} language.{context}",
     }
-    return prompts.get(interview_type, f"Generate a {difficulty} level general interview question.In {language} language")
+    return prompts.get(interview_type, f"Generate a {difficulty} level general interview question. In {language} language.{context}")
 
 def build_feedback_prompt(question: str, answer: str, interview_type: str, language: str = "English") -> str:
     return f"""
@@ -40,12 +51,12 @@ Give structured feedback with these sections, in this {language}:
 Be encouraging but honest. Keep it concise.
 """
 
-@router.get("/question/{interview_type}")
-def get_question(interview_type: str, difficulty: str = "intermediate", language: str = "English"):
-    if interview_type not in ["behavioral", "technical", "intro"]:
+@router.post("/question")
+def get_question(body: QuestionRequest):
+    if body.interview_type not in ["behavioral", "technical", "intro"]:
         return {"error": "Invalid type. Choose: behavioral, technical, intro"}
 
-    prompt = build_question_prompt(interview_type,difficulty,language)
+    prompt = build_question_prompt(body.interview_type, body.difficulty, body.language, body.cv_text, body.job_description)
 
     response = client.chat.completions.create(
         model="gpt-4o-mini",
@@ -56,7 +67,7 @@ def get_question(interview_type: str, difficulty: str = "intermediate", language
     )
 
     question = response.choices[0].message.content.strip()
-    return {"interview_type": interview_type, "question": question}
+    return {"interview_type": body.interview_type, "question": question}
 
 @router.post("/feedback")
 def get_feedback(body: AnswerRequest, db: Session = Depends(get_db)):

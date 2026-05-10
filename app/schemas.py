@@ -18,4 +18,10 @@ class SessionResponse(BaseModel):
     created_at: datetime.datetime
     class Config:
        from_attributes = True
-
+       
+class QuestionRequest(BaseModel):
+    interview_type: str
+    difficulty: str = "intermediate"
+    language: str = "English"
+    cv_text: Optional[str] = None
+    job_description: Optional[str] = None

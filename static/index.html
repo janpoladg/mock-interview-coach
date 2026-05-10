@@ -32,7 +32,31 @@
         <option value="Russian">🌐 Русский</option>
       </select>
     </div>
-  
+    <!-- CV Upload Section -->
+    <div style="margin-bottom: 1.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem;">
+      <p data-i18n="cv_upload_title" style="font-size: 0.85rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.8rem;">📄 Upload CV (optional)</p>
+
+      <input
+        type="file"
+        id="cv-file-input"
+        accept=".pdf,.docx"
+        style="display: none;"
+        onchange="uploadCV(this.files[0])"
+      />
+
+      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+        <button class="btn btn-ghost" onclick="document.getElementById('cv-file-input').click()" data-i18n="cv_btn">
+          📎 Choose PDF or DOCX
+        </button>
+        <span id="cv-status" data-i18n="cv_no_file" style="font-size: 0.8rem; color: var(--text-muted);">No file uploaded</span>
+      </div>
+
+      <textarea
+        id="job-description" data-i18n-placeholder="job_desc_placeholder" 
+        placeholder="Paste job description here (optional)..."
+        style="width: 100%; margin-top: 0.8rem; background: var(--bg-page); border: 1px solid var(--border); border-radius: 8px; padding: 0.8rem; color: var(--text-primary); font-size: 0.85rem; font-family: inherit; resize: vertical; min-height: 80px; outline: none;"
+      ></textarea>
+    </div>
     <div class="type-grid">
       <div class="type-card" onclick="startInterview('behavioral')">
         <div class="icon">🧠</div>
