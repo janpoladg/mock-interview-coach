@@ -13,6 +13,7 @@ An AI-powered interview practice tool that generates questions and gives instant
 - Session history and statistics dashboard
 - Dark / light theme support
 - Timed mode with countdown timer and auto-submit
+- CV and job description upload for personalized questions (PDF & DOCX)
 
 ## Tech Stack
 - **Backend:** Python, FastAPI
@@ -28,9 +29,10 @@ mock-interview-coach/
 │   ├── models.py        # Database tables
 │   ├── schemas.py       # Request/response shapes
 │   └── routes/
-│       ├── interview.py # Question and feedback endpoints
-│       ├── history.py   # Session history endpoint
-│       └── stats.py     # Stats endpoint
+│       ├── interview.py  # Question and feedback endpoints
+│       ├── history.py    # Session history endpoint
+│       ├── stats.py      # Stats endpoint
+│       └── upload.py     # CV file upload endpoint
 ├── static/
 │   ├── index.html       # Frontend markup
 │   ├── style.css        # Styles and theming
