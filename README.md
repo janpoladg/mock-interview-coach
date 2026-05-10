@@ -12,7 +12,7 @@ An AI-powered interview practice tool that generates questions and gives instant
 - Instant AI feedback with scoring and improvement tips
 - Session history and statistics dashboard
 - Dark / light theme support
- Timed mode with countdown timer and auto-submit
+- Timed mode with countdown timer and auto-submit
 
 ## Tech Stack
 - **Backend:** Python, FastAPI
