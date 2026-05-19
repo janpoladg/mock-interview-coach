@@ -2,6 +2,10 @@
 
 An AI-powered interview practice tool that generates questions and gives instant feedback on your answers.
 
+## Live Demo
+🚀 [Try it here](https://mock-interview-coach-production.up.railway.app/ui)
+
+
 ## Features
 
 - Behavioral, Technical, and Introduction interview modes
