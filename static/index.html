@@ -30,8 +30,27 @@
   <div class="screen active" id="screen-home">
     <h1 data-i18n="home_title">Mock Interview Coach</h1>
     <p class="subtitle" data-i18n="home_subtitle">Pick a category and practice with AI-powered feedback.</p>
+    
+    <div class="type-grid">
+      <div class="type-card" onclick="startInterview('behavioral')">
+        <div class="icon">🧠</div>
+        <div class="label" data-i18n="type_behavioral">Behavioral</div>
+        <div class="desc" data-i18n="type_behavioral_desc">STAR format questions</div>
+      </div>
+      <div class="type-card" onclick="startInterview('technical')">
+        <div class="icon">💻</div>
+        <div class="label" data-i18n="type_technical">Technical</div>
+        <div class="desc" data-i18n="type_technical_desc">DSA & Python questions</div>
+      </div>
+      <div class="type-card" onclick="startInterview('intro')">
+        <div class="icon">👋</div>
+        <div class="label" data-i18n="type_intro">Introduction</div>
+        <div class="desc" data-i18n="type_intro_desc">Tell me about yourself</div>
+      </div>
+    </div>
+
     <!-- CV Upload Section -->
-    <div style="margin-bottom: 1.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem;">
+    <div style="margin-top: 1.5rem; margin-bottom: 1.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem;">
       <p data-i18n="cv_upload_title" style="font-size: 0.85rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.8rem;">📄 Upload CV (optional)</p>
 
       <input
@@ -54,23 +73,6 @@
         placeholder="Paste job description here (optional)..."
         style="width: 100%; margin-top: 0.8rem; background: var(--bg-page); border: 1px solid var(--border); border-radius: 8px; padding: 0.8rem; color: var(--text-primary); font-size: 0.85rem; font-family: inherit; resize: vertical; min-height: 80px; outline: none;"
       ></textarea>
-    </div>
-    <div class="type-grid">
-      <div class="type-card" onclick="startInterview('behavioral')">
-        <div class="icon">🧠</div>
-        <div class="label" data-i18n="type_behavioral">Behavioral</div>
-        <div class="desc" data-i18n="type_behavioral_desc">STAR format questions</div>
-      </div>
-      <div class="type-card" onclick="startInterview('technical')">
-        <div class="icon">💻</div>
-        <div class="label" data-i18n="type_technical">Technical</div>
-        <div class="desc" data-i18n="type_technical_desc">DSA & Python questions</div>
-      </div>
-      <div class="type-card" onclick="startInterview('intro')">
-        <div class="icon">👋</div>
-        <div class="label" data-i18n="type_intro">Introduction</div>
-        <div class="desc" data-i18n="type_intro_desc">Tell me about yourself</div>
-      </div>
     </div>
     <div class="btn-row" style="margin-top: 1.5rem; justify-content: center;">
       <button class="btn btn-ghost" onclick="loadHistory()" data-i18n="btn_history">📋 View History</button>
