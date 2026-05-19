@@ -10,28 +10,26 @@
 <body>
 
 <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">☀️ Light mode</button>
-
+<!-- Language dropdown -->
+  <select id="language-select" onchange="setLanguage(this.value)"
+    style="position: fixed; top: 1.2rem; left: 1.2rem;
+            background: var(--bg-card); color: var(--text-primary);
+            border: 1px solid var(--border); border-radius: 8px;
+            padding: 6px 10px; font-size: 0.8rem; cursor: pointer;
+            outline: none; z-index: 100;">
+    <option value="English">🌐 English</option>
+    <option value="Spanish">🌐 Español</option>
+    <option value="French">🌐 Français</option>
+    <option value="German">🌐 Deutsch</option>
+    <option value="Turkish">🌐 Türkçe</option>
+    <option value="Russian">🌐 Русский</option>
+  </select>
 <div class="container">
 
   <!-- Screen 1: Home -->
   <div class="screen active" id="screen-home">
     <h1 data-i18n="home_title">Mock Interview Coach</h1>
     <p class="subtitle" data-i18n="home_subtitle">Pick a category and practice with AI-powered feedback.</p>
-
-    <!-- Language dropdown -->
-    <div style="margin-bottom: 1.5rem;">
-      <select id="language-select" onchange="setLanguage(this.value)"
-        style="background: var(--bg-card); color: var(--text-primary);
-               border: 1px solid var(--border); border-radius: 8px;
-               padding: 8px 12px; font-size: 0.9rem; cursor: pointer; outline: none;">
-        <option value="English">🌐 English</option>
-        <option value="Spanish">🌐 Español</option>
-        <option value="French">🌐 Français</option>
-        <option value="German">🌐 Deutsch</option>
-        <option value="Turkish">🌐 Türkçe</option>
-        <option value="Russian">🌐 Русский</option>
-      </select>
-    </div>
     <!-- CV Upload Section -->
     <div style="margin-bottom: 1.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem;">
       <p data-i18n="cv_upload_title" style="font-size: 0.85rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.8rem;">📄 Upload CV (optional)</p>

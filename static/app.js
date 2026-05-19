@@ -354,8 +354,9 @@
   function setLanguage(lang) {
     currentLanguage = lang;
     applyTranslations();
-    if (currentType) startInterview(currentType);
-   }
+    const onQuestionScreen = document.getElementById('screen-question').classList.contains('active');
+    if (onQuestionScreen) startInterview(currentType);
+  }
    /* Upload CV function */
   async function uploadCV(file) {
     const formData = new FormData();
