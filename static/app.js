@@ -279,6 +279,9 @@
   let activeTab         = 'text';
   let cvText = '';
   let jobDescription = '';
+  let technicalType = null;    // "coding", "theory", "mixed"
+  let subCategory = null;      // optional sub-category
+  let progLanguage = null;     // "Python", "Java", "JavaScript", "C++", "C"
   /* ── Monaco setup ── */
   require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs' }});
   require(['vs/editor/editor.main'], function() {
@@ -466,6 +469,15 @@
       tabs.style.display = 'none';
       switchToTextTab();
     }
+    
+    if (type === 'technical') {
+      document.getElementById('technical-options').style.display = 'block';
+    } else {
+      document.getElementById('technical-options').style.display = 'none';
+      technicalType = null;
+      subCategory = null;
+      progLanguage = null;
+    }
 
     showScreen('screen-question');
     document.getElementById('question-tag').textContent = type;
@@ -482,12 +494,68 @@
         difficulty: currentDifficulty,
         language: currentLanguage,
         cv_text: cvText || null,
-        job_description: jobDescription || null
+        job_description: jobDescription || null,
+        technical_type: technicalType,
+        sub_category: subCategory,
+        prog_language: progLanguage
       })
     });
     const data = await res.json();
     currentQuestion = data.question;
     document.getElementById('question-text').textContent = data.question;
+  }
+  function setTechnicalType(type) {
+    technicalType = type;
+    subCategory = null;
+    progLanguage = null;
+
+    // highlight active button
+    document.querySelectorAll('.tech-type-btn').forEach(b => b.classList.remove('active-diff'));
+    event.target.classList.add('active-diff');
+
+    // show/hide language selector
+    const langSelector = document.getElementById('prog-lang-selector');
+    langSelector.style.display = (type === 'coding' || type === 'mixed') ? 'block' : 'none';
+
+    // show sub-categories based on type
+    const subSelector = document.getElementById('sub-category-selector');
+    const subBtns = document.getElementById('sub-category-btns');
+    subSelector.style.display = 'block';
+
+    const codingCats = ['Arrays & Strings', 'Trees & Graphs', 'Dynamic Programming', 'Sorting & Searching', 'Linked Lists', 'Recursion'];
+    const theoryCats = ['OOP', 'System Design', 'Databases', 'Operating Systems', 'Networking', 'Data Structures'];
+
+    const cats = (type === 'theory') ? theoryCats : codingCats;
+    subBtns.innerHTML = cats.map(cat => 
+      `<button class="btn btn-ghost sub-cat-btn" onclick="setSubCategory('${cat}')">${cat}</button>`
+    ).join('');
+
+    // reload question with new type
+    startInterview(currentType);
+  }
+  function setProgLanguage(lang) {
+    progLanguage = lang;
+    document.querySelectorAll('.lang-tech-btn').forEach(b => b.classList.remove('active-diff'));
+    event.target.classList.add('active-diff');
+    if (monacoReady) {
+      const monacoLang = {
+        'Python': 'python',
+        'Java': 'java',
+        'JavaScript': 'javascript',
+        'C++': 'cpp',
+        'C': 'c'
+      }[lang] || 'python';
+      monaco.editor.setModelLanguage(monacoEditor.getModel(), monacoLang);
+      monacoEditor.setValue(`// Write your ${lang} code here\n`);
+    }
+    startInterview(currentType);
+  }
+
+  function setSubCategory(cat) {
+    subCategory = cat;
+    document.querySelectorAll('.sub-cat-btn').forEach(b => b.classList.remove('active-diff'));
+    event.target.classList.add('active-diff');
+    startInterview(currentType);
   }
 
   function switchToTextTab() {

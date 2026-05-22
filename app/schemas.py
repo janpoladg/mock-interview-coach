@@ -25,3 +25,8 @@ class QuestionRequest(BaseModel):
     language: str = "English"
     cv_text: Optional[str] = None
     job_description: Optional[str] = None
+    technical_type: Optional[str] = None # "coding", "theory", "mixed"
+    sub_category: Optional[str] = None # 'arrays', 'oop', 'system design' etc
+    prog_language: Optional[str] = None # 'Python, 'C','C++' etc
+
+

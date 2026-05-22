@@ -16,7 +16,12 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 router = APIRouter()
 
 
-def build_question_prompt(interview_type: str, difficulty: str = "intermediate", language: str = "English", cv_text: Optional[str] = None, job_description: Optional[str] = None) -> str:
+def build_question_prompt(interview_type: str, difficulty: str = "intermediate", 
+                          language: str = "English", cv_text: Optional[str] = None, 
+                          job_description: Optional[str] = None,
+                          technical_type: Optional[str] = None,
+                          sub_category: Optional[str] = None,
+                          prog_language: Optional[str] = None) -> str:
     
     context = ""
     if cv_text or job_description:
@@ -25,11 +30,28 @@ def build_question_prompt(interview_type: str, difficulty: str = "intermediate",
             context += f"\nCandidate CV: {cv_text[:1000]}"
         if job_description:
             context += f"\nJob description: {job_description[:500]}"
-        context += "\nUse this context to make the question specific and relevant to this candidate and role."
+        context += "\nUse this context to make the question specific and relevant to this candidate and role. If the job description mentions specific technologies or languages, prioritize those."
 
+    # Build technical prompt based on type
+    if interview_type == "technical":
+        lang_str = prog_language or "any programming language"
+        cat_str = f"focused on {sub_category}" if sub_category else ""
+        if technical_type == "coding":
+            tech_prompt = f"Generate a single {difficulty} level coding interview question in {lang_str}{cat_str}. The question must require writing actual code to solve. Just the question, nothing else. In {language} language.{context}"
+
+        elif technical_type == "theory":
+            tech_prompt = f"Generate a single {difficulty} level theoretical interview question{cat_str}. The question should test conceptual understanding, no coding required. Just the question, nothing else. In {language} language.{context}"
+
+        elif technical_type == "mixed":
+            tech_prompt = f"Generate a single {difficulty} level technical interview question in {lang_str}{cat_str} that requires both a conceptual explanation AND a code implementation. Just the question, nothing else. In {language} language.{context}"
+
+        else:
+            # No technical_type selected — generic technical question
+            tech_prompt = f"Generate a single {difficulty} level technical interview question about data structures, algorithms, or software engineering concepts. Just the question, nothing else. In {language} language.{context}"
+
+        return tech_prompt
     prompts = {
         "behavioral": f"Generate a single {difficulty} level behavioral interview question that tests teamwork, leadership, or handling failure. Just the question, nothing else. In {language} language.{context}",
-        "technical": f"Generate a single {difficulty} level technical interview question about Python, data structures, or algorithms. Just the question, nothing else. In {language} language.{context}",
         "intro": f"Generate a single {difficulty} level interview question from the 'getting to know you' category. Just the question, nothing else. In {language} language.{context}",
     }
     return prompts.get(interview_type, f"Generate a {difficulty} level general interview question. In {language} language.{context}")
@@ -56,7 +78,15 @@ def get_question(body: QuestionRequest):
     if body.interview_type not in ["behavioral", "technical", "intro"]:
         return {"error": "Invalid type. Choose: behavioral, technical, intro"}
 
-    prompt = build_question_prompt(body.interview_type, body.difficulty, body.language, body.cv_text, body.job_description)
+    prompt = build_question_prompt(
+        body.interview_type, 
+        body.difficulty, 
+        body.language, 
+        body.cv_text, 
+        body.job_description,
+        body.technical_type,
+        body.sub_category,
+        body.prog_language)
 
     response = client.chat.completions.create(
         model="gpt-4o-mini",

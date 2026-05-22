@@ -41,6 +41,7 @@
         <div class="icon">💻</div>
         <div class="label" data-i18n="type_technical">Technical</div>
         <div class="desc" data-i18n="type_technical_desc">DSA & Python questions</div>
+        
       </div>
       <div class="type-card" onclick="startInterview('intro')">
         <div class="icon">👋</div>
@@ -95,7 +96,36 @@
         <button class="btn btn-ghost diff-btn" onclick="setDifficulty('senior')" data-i18n="diff_senior">Senior</button>
       </div>
     </div>
+    <!-- Technical options — only shown for technical type -->
+    <div id="technical-options" style="display:none; margin-bottom: 1rem;">
+      
+      <!-- Type selector -->
+      <p style="font-size: 0.8rem; color: var(--text-label); margin-bottom: 8px;">Question Type</p>
+      <div style="display: flex; gap: 8px; margin-bottom: 1rem;">
+        <button class="btn btn-ghost tech-type-btn" onclick="setTechnicalType('coding')">💻 Coding</button>
+        <button class="btn btn-ghost tech-type-btn" onclick="setTechnicalType('theory')">📚 Theory</button>
+        <button class="btn btn-ghost tech-type-btn" onclick="setTechnicalType('mixed')">🔀 Mixed</button>
+      </div>
 
+      <!-- Programming language — only for coding and mixed -->
+      <div id="prog-lang-selector" style="display:none; margin-bottom: 1rem;">
+        <p style="font-size: 0.8rem; color: var(--text-label); margin-bottom: 8px;">Programming Language</p>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button class="btn btn-ghost lang-tech-btn" onclick="setProgLanguage('Python')">Python</button>
+          <button class="btn btn-ghost lang-tech-btn" onclick="setProgLanguage('Java')">Java</button>
+          <button class="btn btn-ghost lang-tech-btn" onclick="setProgLanguage('JavaScript')">JavaScript</button>
+          <button class="btn btn-ghost lang-tech-btn" onclick="setProgLanguage('C++')">C++</button>
+          <button class="btn btn-ghost lang-tech-btn" onclick="setProgLanguage('C')">C</button>
+        </div>
+      </div>
+
+      <!-- Sub-category -->
+      <div id="sub-category-selector" style="display:none; margin-bottom: 1rem;">
+        <p style="font-size: 0.8rem; color: var(--text-label); margin-bottom: 8px;">Topic (optional)</p>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="sub-category-btns"></div>
+      </div>
+
+    </div>
     <!-- Timer -->
     <div style="margin-bottom: 1rem;">
       <p style="font-size: 0.8rem; color: var(--text-label); margin-bottom: 8px;" data-i18n="label_timer">Timer Duration</p>
