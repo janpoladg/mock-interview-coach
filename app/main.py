@@ -8,6 +8,7 @@ from app.database import Base, engine
 from app.routes.interview import router as interview_router
 from app.routes.stats import router as stats_router
 from app.routes.upload import router as upload_router
+from app.routes.auth import router as auth_router
 @asynccontextmanager
 async def lifespan(app):
     Base.metadata.create_all(bind=engine)
@@ -27,6 +28,7 @@ app.include_router(interview_router)
 app.include_router(history_router)
 app.include_router(stats_router)
 app.include_router(upload_router)
+app.include_router(auth_router, prefix="/auth")
 @app.get("/")
 def read_root():
     return {"message": "Mock Interview Coach is running!"}

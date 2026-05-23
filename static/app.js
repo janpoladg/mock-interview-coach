@@ -605,99 +605,188 @@
     document.getElementById('feedback-content').innerHTML = marked.parse(data.feedback);
 
     showScreen('screen-feedback');
-  }
+}
 
-  function tryAgain() { startInterview(currentType); }
+function tryAgain() { startInterview(currentType); }
 
-  async function loadHistory() {
-    showScreen('screen-history');
+    async function loadHistory() {
+      showScreen('screen-history');
 
-    try {
-        const res = await fetch("/history");
-        const sessions = await res.json();
+      try {
+          const res = await fetch("/history");
+          const sessions = await res.json();
 
-        const container = document.getElementById("history-list");
-        container.innerHTML = "";
+          const container = document.getElementById("history-list");
+          container.innerHTML = "";
 
-        if (sessions.length === 0) {
-        container.innerHTML = `<p class="subtitle">${t('no_sessions')}</p>`;
-        return;
-        }
+          if (sessions.length === 0) {
+          container.innerHTML = `<p class="subtitle">${t('no_sessions')}</p>`;
+          return;
+          }
 
-        sessions.forEach(session => {
-        const item = document.createElement("div");
+          sessions.forEach(session => {
+          const item = document.createElement("div");
 
-        item.className = "history-card";
+          item.className = "history-card";
 
-        item.innerHTML = `
-            <h3>${session.question}</h3>
+          item.innerHTML = `
+              <h3>${session.question}</h3>
 
-            <p>
-            <strong>${t('label_type')}:</strong>
-            ${t('cat_' + session.interview_type)}
-            </p>
+              <p>
+              <strong>${t('label_type')}:</strong>
+              ${t('cat_' + session.interview_type)}
+              </p>
 
-            <p>
-            <strong>${t('label_score')}:</strong>
-            ${session.score}/10
-            </p>
+              <p>
+              <strong>${t('label_score')}:</strong>
+              ${session.score}/10
+              </p>
 
-            <p>
-            <strong>${t('label_date')}:</strong>
-            ${new Date(session.created_at).toLocaleDateString()}
-            </p>
+              <p>
+              <strong>${t('label_date')}:</strong>
+              ${new Date(session.created_at).toLocaleDateString()}
+              </p>
 
-            <p class="preview">
-            ${session.feedback.substring(0, 150)}...
-            </p>
+              <p class="preview">
+              ${session.feedback.substring(0, 150)}...
+              </p>
 
-            <p class="expand-hint">
-            ${t('expand_hint')}
-            </p>
+              <p class="expand-hint">
+              ${t('expand_hint')}
+              </p>
 
-            <div class="feedback-detail">
-            ${marked.parse(session.feedback)}
-            </div>
-        `;
+              <div class="feedback-detail">
+              ${marked.parse(session.feedback)}
+              </div>
+          `;
 
-        item.onclick = () => {
-            const detail = item.querySelector(".feedback-detail");
-            const hint = item.querySelector(".expand-hint");
+          item.onclick = () => {
+              const detail = item.querySelector(".feedback-detail");
+              const hint = item.querySelector(".expand-hint");
 
-            detail.classList.toggle("expanded");
+              detail.classList.toggle("expanded");
 
-            hint.textContent = detail.classList.contains("expanded")
-            ? t('collapse_hint')
-            : t('expand_hint');
-        };
+              hint.textContent = detail.classList.contains("expanded")
+              ? t('collapse_hint')
+              : t('expand_hint');
+          };
 
-        container.appendChild(item);
-        });
+          container.appendChild(item);
+          });
 
-    } catch (error) {
-        console.error("Failed to load history:", error);
-    }
+      } catch (error) {
+          console.error("Failed to load history:", error);
+      }
 }
 
 async function loadStats() {
-  showScreen('screen-stats');
+    showScreen('screen-stats');
 
-  try {
-    const res = await fetch("/stats");
-    const data = await res.json();
+    try {
+      const res = await fetch("/stats");
+      const data = await res.json();
 
-    document.getElementById("stat-total").textContent =
-      data.total_sessions;
+      document.getElementById("stat-total").textContent =
+        data.total_sessions;
 
-    document.getElementById("stat-avg").textContent =
-      data.average_score + "/10";
+      document.getElementById("stat-avg").textContent =
+        data.average_score + "/10";
 
-    document.getElementById("stat-best").textContent =
-      data.best_category
-        ? t('cat_' + data.best_category)
-        : "–";
+      document.getElementById("stat-best").textContent =
+        data.best_category
+          ? t('cat_' + data.best_category)
+          : "–";
 
-  } catch (error) {
-    console.error("Failed to load stats:", error);
+    } catch (error) {
+      console.error("Failed to load stats:", error);
+    }
+}
+/* ── Auth ── */
+function getToken() {
+  return localStorage.getItem('token');
+}
+
+function saveToken(token) {
+  localStorage.setItem('token', token);
+}
+
+function logout() {
+  localStorage.removeItem('token');
+  showScreen('screen-login');
+}
+
+async function login() {
+  const loginVal = document.getElementById('login-input').value.trim();
+  const password = document.getElementById('login-password').value.trim();
+  const errorEl = document.getElementById('login-error');
+  errorEl.style.display = 'none';
+
+  if (!loginVal || !password) {
+    errorEl.textContent = 'Please fill in all fields';
+    errorEl.style.display = 'block';
+    return;
   }
+
+  const res = await fetch('/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ login: loginVal, password })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    errorEl.textContent = data.detail || 'Login failed';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  saveToken(data.access_token);
+  saveToken(data.access_token);
+  const payload = JSON.parse(atob(data.access_token.split('.')[1]));
+  document.getElementById('welcome-msg').textContent = `👋 Welcome back, ${payload.username}!`;
+  showScreen('screen-home');
+  showScreen('screen-home');
+}
+
+async function signup() {
+  const username = document.getElementById('signup-username').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value.trim();
+  const errorEl = document.getElementById('signup-error');
+  errorEl.style.display = 'none';
+
+  if (!username || !email || !password) {
+    errorEl.textContent = 'Please fill in all fields';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  const res = await fetch('/auth/signup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, email, password })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    errorEl.textContent = data.detail || 'Signup failed';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  // auto login after signup
+  document.getElementById('login-input').value = username;
+  document.getElementById('login-password').value = password;
+  await login();
+}
+// Run on page load
+if (getToken()) {
+  showScreen('screen-home');
+  // decode token to get username
+  const payload = JSON.parse(atob(getToken().split('.')[1]));
+  document.getElementById('welcome-msg').textContent = `👋 Welcome back, ${payload.username}!`;
+} else {
+  showScreen('screen-login');
 }
